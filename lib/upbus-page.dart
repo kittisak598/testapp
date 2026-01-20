@@ -314,7 +314,7 @@ class _UpBusHomePageState extends State<UpBusHomePage> {
                                       width: 45,
                                       height: 45,
                                       child: Image.asset(
-                                        'assets/images/bus3icon.png',
+                                        'assets/images/busiconall.png',
                                         fit: BoxFit.contain,
                                       ),
                                     );
