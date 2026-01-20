@@ -76,13 +76,29 @@ class _RoutePageState extends State<RoutePage> {
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children: [
-                          _routeFilterButton('ภาพรวม', Colors.black87, 0),
-                          const SizedBox(width: 8),
-                          _routeFilterButton('หน้ามอ', Colors.blue.shade800, 1),
-                          const SizedBox(width: 8),
-                          _routeFilterButton('หอใน', Colors.amber.shade600, 2),
-                          const SizedBox(width: 8),
-                          _routeFilterButton('ICT', Colors.red.shade600, 3),
+                          _routeFilterButton(
+                            'ภาพรวม',
+                            const Color.fromRGBO(143, 55, 203, 1),
+                            0,
+                          ),
+                          const SizedBox(width: 10),
+                          _routeFilterButton(
+                            'หน้ามอ',
+                            const Color.fromRGBO(68, 182, 120, 1),
+                            1,
+                          ),
+                          const SizedBox(width: 10),
+                          _routeFilterButton(
+                            'หอใน',
+                            const Color.fromRGBO(255, 56, 89, 1),
+                            2,
+                          ),
+                          const SizedBox(width: 10),
+                          _routeFilterButton(
+                            'ICT',
+                            const Color.fromRGBO(17, 119, 252, 1),
+                            3,
+                          ),
                         ],
                       ),
                     ),
@@ -108,7 +124,10 @@ class _RoutePageState extends State<RoutePage> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
           side: isSelected
-              ? const BorderSide(color: Colors.white, width: 2)
+              ? const BorderSide(
+                  color: Color.fromRGBO(255, 255, 255, 1),
+                  width: 3,
+                )
               : BorderSide.none,
         ),
         elevation: isSelected ? 5 : 1,

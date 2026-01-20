@@ -629,7 +629,7 @@ class _UpBusHomePageState extends State<UpBusHomePage> {
         minimumSize: const Size(double.infinity, 30),
         //paddingดันขนาดปุ่ม
         padding: const EdgeInsets.symmetric(vertical: 14),
-        elevation: isSelected ? 4 : 0,
+        elevation: isSelected ? 4 : 1,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       ),
       onPressed: onPressed,
