@@ -9,6 +9,9 @@ import 'services/route_service.dart';
 import 'services/notification_service.dart';
 import 'models/bus_model.dart';
 
+import 'dart:convert';
+import 'package:flutter/services.dart' show rootBundle;
+
 String? selectedBusStopId;
 
 class UpBusHomePage extends StatefulWidget {
@@ -26,6 +29,9 @@ class _UpBusHomePageState extends State<UpBusHomePage> {
   final MapController _mapController = MapController();
 
   final DatabaseReference _gpsRef = FirebaseDatabase.instance.ref("GPS");
+
+  List<Polyline> _allPolylines = []; // เก็บเส้นทางทั้งหมด 3 สาย
+  List<Polyline> _displayPolylines = []; // เก็บเส้นทางที่จะแสดงผลปัจจุบัน
 
   // --- Multi-Bus Tracking Variables ---
   StreamSubscription? _busSubscription;
@@ -49,6 +55,69 @@ class _UpBusHomePageState extends State<UpBusHomePage> {
     _initializeServices();
     _listenToBusLocation();
     _startLocationTracking();
+    _loadAllRoutes();
+  }
+
+  //future ดึงเส้นทาง
+  Future<void> _loadAllRoutes() async {
+    try {
+      // โหลด 3 ไฟล์ (เปลี่ยน path ให้ตรงกับไฟล์ของคุณ)
+      // 0=หน้ามอ(เขียว), 1=หอใน(แดง), 2=ICT(น้ำเงิน)
+      Polyline routeNamor = await _parseGeoJson(
+        'assets/data/bus_route1.geojson',
+        const Color.fromRGBO(68, 182, 120, 1),
+      );
+      Polyline routeHornai = await _parseGeoJson(
+        'assets/data/bus_route2.geojson',
+        const Color.fromRGBO(255, 56, 89, 1),
+      );
+      Polyline routeICT = await _parseGeoJson(
+        'assets/data/bus_route3.geojson',
+        const Color.fromRGBO(17, 119, 252, 1),
+      );
+
+      if (!mounted) return;
+      setState(() {
+        _allPolylines = [routeNamor, routeHornai, routeICT];
+        _displayPolylines = _allPolylines; // เริ่มต้นแสดงทั้งหมด
+      });
+    } catch (e) {
+      debugPrint("Error loading routes: $e");
+    }
+  }
+
+  Future<Polyline> _parseGeoJson(String assetPath, Color color) async {
+    String data = await rootBundle.loadString(assetPath);
+    var jsonResult = jsonDecode(data);
+    List<LatLng> points = [];
+
+    var features = jsonResult['features'] as List;
+    for (var feature in features) {
+      var geometry = feature['geometry'];
+      if (geometry['type'] == 'LineString') {
+        var coordinates = geometry['coordinates'] as List;
+        for (var coord in coordinates) {
+          // GeoJSON เป็น [Long, Lat] แต่ FlutterMap ใช้ [Lat, Long] ต้องสลับ
+          points.add(LatLng(coord[1], coord[0]));
+        }
+      }
+    }
+    return Polyline(points: points, color: color, strokeWidth: 4.0);
+  }
+
+  // --- ส่วนที่ต้องเพิ่ม: ฟังก์ชันกรองเส้นทางตามปุ่ม ---
+  void _filterRoutes(int index) {
+    setState(() {
+      if (index == 0) {
+        _displayPolylines = _allPolylines; // ภาพรวม
+      } else if (index == 1 && _allPolylines.isNotEmpty) {
+        _displayPolylines = [_allPolylines[0]]; // หน้ามอ
+      } else if (index == 2 && _allPolylines.length > 1) {
+        _displayPolylines = [_allPolylines[1]]; // หอใน
+      } else if (index == 3 && _allPolylines.length > 2) {
+        _displayPolylines = [_allPolylines[2]]; // ICT
+      }
+    });
   }
 
   Future<void> _initializeServices() async {
@@ -205,6 +274,7 @@ class _UpBusHomePageState extends State<UpBusHomePage> {
                                       'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                                   userAgentPackageName: 'com.upbus.app',
                                 ),
+                                PolylineLayer(polylines: _displayPolylines),
                                 StreamBuilder(
                                   stream: FirebaseFirestore.instance
                                       .collection('Bus stop')
@@ -476,8 +546,10 @@ class _UpBusHomePageState extends State<UpBusHomePage> {
                             label: 'ภาพรวม',
                             color: Colors.black87,
                             isSelected: _selectedRouteIndex == 0,
-                            onPressed: () =>
-                                setState(() => _selectedRouteIndex = 0),
+                            onPressed: () {
+                              setState(() => _selectedRouteIndex = 0);
+                              _filterRoutes(0);
+                            },
                           ),
                         ),
                         const SizedBox(width: 6),
@@ -488,22 +560,21 @@ class _UpBusHomePageState extends State<UpBusHomePage> {
                             isSelected: _selectedRouteIndex == 1,
                             onPressed: () {
                               setState(() => _selectedRouteIndex = 1);
-                              _mapController.move(
-                                const LatLng(19.028, 99.895),
-                                17,
-                              );
+                              _filterRoutes(1);
                             },
                           ),
                         ),
-                        // ... ปุ่มอื่นๆ ...
+
                         const SizedBox(width: 6),
                         Expanded(
                           child: _routeButton(
                             label: 'หอใน',
                             color: Colors.amber.shade600,
                             isSelected: _selectedRouteIndex == 2,
-                            onPressed: () =>
-                                setState(() => _selectedRouteIndex = 2),
+                            onPressed: () {
+                              setState(() => _selectedRouteIndex = 2);
+                              _filterRoutes(2);
+                            },
                           ),
                         ),
                         const SizedBox(width: 6),
@@ -512,8 +583,10 @@ class _UpBusHomePageState extends State<UpBusHomePage> {
                             label: 'ICT',
                             color: Colors.red.shade600,
                             isSelected: _selectedRouteIndex == 3,
-                            onPressed: () =>
-                                setState(() => _selectedRouteIndex = 3),
+                            onPressed: () {
+                              setState(() => _selectedRouteIndex = 3);
+                              _filterRoutes(3);
+                            },
                           ),
                         ),
                       ],
