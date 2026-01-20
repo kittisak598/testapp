@@ -239,7 +239,13 @@ class _BusStopPageState extends State<BusStopPage> {
 
   Widget _buildTopBar(BuildContext context) {
     return Container(
-      color: const Color(0xFF9C27B0),
+      decoration: BoxDecoration(
+        color: const Color(0xFF9C27B0),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(15),
+          bottomRight: Radius.circular(15),
+        ),
+      ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       child: Row(
         children: [
@@ -304,7 +310,13 @@ class _BusStopPageState extends State<BusStopPage> {
   // --- [แก้ไข] ส่วน Bottom Bar ใหม่ ---
   Widget _buildBottomBar() {
     return Container(
-      color: const Color(0xFF9C27B0),
+      decoration: BoxDecoration(
+        color: const Color(0xFF9C27B0),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(15),
+          topRight: Radius.circular(15),
+        ),
+      ),
       // ลด Padding แนวนอนลงนิดหน่อย เพื่อให้ spaceEvenly ทำงานได้สวยขึ้น
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
       child: SizedBox(

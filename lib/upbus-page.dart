@@ -221,6 +221,7 @@ class _UpBusHomePageState extends State<UpBusHomePage> {
       ),
     );
 
+    if (!mounted) return;
     setState(() {
       _buses = busesWithDistance;
       _closestBus = busesWithDistance.isNotEmpty
@@ -538,13 +539,13 @@ class _UpBusHomePageState extends State<UpBusHomePage> {
 
                   // ส่วนปุ่มเลือกสถานที่
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(6.0),
                     child: Row(
                       children: [
                         Expanded(
                           child: _routeButton(
                             label: 'ภาพรวม',
-                            color: Colors.black87,
+                            color: const Color.fromRGBO(143, 55, 203, 1),
                             isSelected: _selectedRouteIndex == 0,
                             onPressed: () {
                               setState(() => _selectedRouteIndex = 0);
@@ -556,7 +557,7 @@ class _UpBusHomePageState extends State<UpBusHomePage> {
                         Expanded(
                           child: _routeButton(
                             label: 'หน้ามอ',
-                            color: Colors.blue.shade800,
+                            color: const Color.fromRGBO(68, 182, 120, 1),
                             isSelected: _selectedRouteIndex == 1,
                             onPressed: () {
                               setState(() => _selectedRouteIndex = 1);
@@ -569,7 +570,7 @@ class _UpBusHomePageState extends State<UpBusHomePage> {
                         Expanded(
                           child: _routeButton(
                             label: 'หอใน',
-                            color: Colors.amber.shade600,
+                            color: const Color.fromRGBO(255, 56, 89, 1),
                             isSelected: _selectedRouteIndex == 2,
                             onPressed: () {
                               setState(() => _selectedRouteIndex = 2);
@@ -581,7 +582,7 @@ class _UpBusHomePageState extends State<UpBusHomePage> {
                         Expanded(
                           child: _routeButton(
                             label: 'ICT',
-                            color: Colors.red.shade600,
+                            color: const Color.fromRGBO(17, 119, 252, 1),
                             isSelected: _selectedRouteIndex == 3,
                             onPressed: () {
                               setState(() => _selectedRouteIndex = 3);
@@ -614,34 +615,40 @@ class _UpBusHomePageState extends State<UpBusHomePage> {
     required bool isSelected,
     required VoidCallback onPressed,
   }) {
-    return SizedBox(
-      height: 46,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color,
-          padding: EdgeInsets.zero,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          elevation: isSelected ? 6 : 2,
-        ),
-        child: Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 13,
-          ),
-          textAlign: TextAlign.center,
-        ),
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        // ถ้าถูกเลือก (isSelected) ให้ใช้สีประจำสาย (color)
+        // ถ้าไม่ถูกเลือก ให้เป็นสีขาว (Colors.white)
+        backgroundColor: isSelected ? color : Colors.white,
+        // ถ้าถูกเลือก ตัวหนังสือเป็นสีขาว ถ้าไม่เลือก ให้เป็นสีเดียวกับสายรถ
+        foregroundColor: isSelected ? Colors.white : color,
+        //ขอบเพื่อให้ปุ่มสีขาวดูชัดขึ้น
+        side: BorderSide(color: color, width: 2),
+        //จุดที่ปรับขนาด
+        //กำหนดความสูงขั้นต่ำ
+        minimumSize: const Size(double.infinity, 30),
+        //paddingดันขนาดปุ่ม
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        elevation: isSelected ? 4 : 0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      ),
+      onPressed: onPressed,
+      child: Text(
+        label,
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
       ),
     );
   }
 
   Widget _buildTopBar(BuildContext context) {
     return Container(
-      color: const Color(0xFF9C27B0),
+      decoration: BoxDecoration(
+        color: const Color(0xFF9C27B0),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(15),
+          bottomRight: Radius.circular(15),
+        ),
+      ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       child: Row(
         children: [
@@ -742,7 +749,13 @@ class _UpBusHomePageState extends State<UpBusHomePage> {
   // BottomBar ที่แก้ให้ใช้ Navigator แบบ Named Route แล้ว
   Widget _buildBottomBar() {
     return Container(
-      color: const Color(0xFF9C27B0),
+      decoration: BoxDecoration(
+        color: const Color(0xFF9C27B0),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(15),
+          topRight: Radius.circular(15),
+        ),
+      ),
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
       child: SizedBox(
         height: 70,

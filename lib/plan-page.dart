@@ -46,7 +46,7 @@ class _PlanPageState extends State<PlanPage> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: const BorderRadius.vertical(
-                  bottom: Radius.circular(20),
+                  bottom: Radius.circular(15),
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -306,7 +306,13 @@ class _PlanPageState extends State<PlanPage> {
 
   Widget _buildTopBar(BuildContext context) {
     return Container(
-      color: const Color(0xFF9C27B0),
+      decoration: BoxDecoration(
+        color: const Color(0xFF9C27B0),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(15),
+          bottomRight: Radius.circular(15),
+        ),
+      ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       child: Row(
         children: [
@@ -354,7 +360,13 @@ class _PlanPageState extends State<PlanPage> {
 
   Widget _buildBottomBar() {
     return Container(
-      color: const Color(0xFF9C27B0),
+      decoration: BoxDecoration(
+        color: const Color(0xFF9C27B0),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(15),
+          topRight: Radius.circular(15),
+        ),
+      ),
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
       child: SizedBox(
         height: 70,

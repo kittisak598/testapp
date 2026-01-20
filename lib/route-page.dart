@@ -121,7 +121,13 @@ class _RoutePageState extends State<RoutePage> {
 
   Widget _buildTopBar(BuildContext context) {
     return Container(
-      color: const Color(0xFF9C27B0),
+      decoration: BoxDecoration(
+        color: const Color(0xFF9C27B0),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(15),
+          bottomRight: Radius.circular(15),
+        ),
+      ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       child: Row(
         children: [
@@ -177,7 +183,13 @@ class _RoutePageState extends State<RoutePage> {
 
   Widget _buildBottomBar() {
     return Container(
-      color: const Color(0xFF9C27B0),
+      decoration: BoxDecoration(
+        color: const Color(0xFF9C27B0),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(15),
+          topRight: Radius.circular(15),
+        ),
+      ),
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
       child: SizedBox(
         height: 70,
@@ -222,6 +234,7 @@ class _RoutePageState extends State<RoutePage> {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected
+              // ignore: deprecated_member_use
               ? Colors.white.withOpacity(0.2)
               : Colors.transparent, // สีพื้นหลังจางๆ
           borderRadius: BorderRadius.circular(16),
