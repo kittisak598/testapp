@@ -311,8 +311,8 @@ class _UpBusHomePageState extends State<UpBusHomePage> {
                                     final isClosest = _closestBus?.id == bus.id;
                                     return Marker(
                                       point: bus.position,
-                                      width: 45,
-                                      height: 45,
+                                      width: 80,
+                                      height: 80,
                                       child: Image.asset(
                                         'assets/images/busiconall.png',
                                         fit: BoxFit.contain,
