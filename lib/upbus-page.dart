@@ -65,12 +65,12 @@ class _UpBusHomePageState extends State<UpBusHomePage> {
       // โหลด 3 ไฟล์ (เปลี่ยน path ให้ตรงกับไฟล์ของคุณ)
       // 0=หน้ามอ(เขียว), 1=หอใน(แดง), 2=ICT(น้ำเงิน)
       Polyline routeNamor = await _parseGeoJson(
-        'assets/data/bus_route1.geojson',
+        'assets/data/bus_route1เส้นทางก่อนบ่าย2.geojson',
         const Color.fromRGBO(68, 182, 120, 1),
       );
-      //เส้นทางก่อนบ่ายสอง
+      //เส้นทางหลังบ่ายสอง
       _routeNamorPKY = await _parseGeoJson(
-        'assets/data/bus_route1เส้นทางก่อนบ่าย2.geojson',
+        'assets/data/bus_route1.geojson',
         const Color.fromRGBO(68, 182, 120, 1),
       );
       Polyline routeHornai = await _parseGeoJson(
@@ -116,25 +116,38 @@ class _UpBusHomePageState extends State<UpBusHomePage> {
     if (_allPolylines.isEmpty) return;
 
     setState(() {
-      //เช็คเวลา
       final now = DateTime.now();
-      // เช็คว่าเวลาตอนนี้ >= 14:00
-      bool isAfter2PM = now.hour >= 14;
 
-      // เลือกเส้นทางหน้ามอตามเวลา
-      Polyline currentNamor = (isAfter2PM && _routeNamorPKY != null)
-          ? _routeNamorPKY!
-          : _allPolylines[0];
+      // สร้างเวลาจุดอ้างอิงของวันนี้
+      final fiveAM = DateTime(now.year, now.month, now.day, 5, 0); // 05:00 น.
+      final twoPM = DateTime(now.year, now.month, now.day, 14, 0); // 14:00 น.
 
+      // เช็คว่า "ตอนนี้" อยู่ในช่วง ตี 5 ถึง บ่าย 2 หรือไม่
+      // (เวลาต้อง >= 05:00 และ < 14:00)
+      bool isMorningRange = now.isAfter(fiveAM) && now.isBefore(twoPM);
+
+      Polyline currentNamor;
+
+      if (isMorningRange) {
+        // ช่วง 05:00 - 13:59:59 ใช้เส้นทางก่อนบ่าย 2
+        currentNamor = _allPolylines[0];
+        print("โหมด: 05:00 - 14:00 (ใช้เส้นทางก่อนบ่าย 2)");
+      } else {
+        // หลัง 14:00 เป็นต้นไป หรือก่อนตี 5 ใช้เส้นทางหลัก
+        // หมายเหตุ: _routeNamorPKY ในที่นี้คือไฟล์ bus_route1.geojson ที่เราโหลดแยกไว้
+        currentNamor = _routeNamorPKY ?? _allPolylines[0];
+        print("โหมด: หลัง 14:00 (ใช้เส้นทาง bus_route1)");
+      }
+
+      // อัปเดตการแสดงผล
       if (index == 0) {
         _displayPolylines = [currentNamor, _allPolylines[1], _allPolylines[2]];
       } else if (index == 1) {
-        //แสดงเฉพาะเส้นทางหน้ามอที่เลือกตามเวลาแล้ว
         _displayPolylines = [currentNamor];
       } else if (index == 2) {
-        _displayPolylines = [_allPolylines[1]]; // หอใน
+        _displayPolylines = [_allPolylines[1]];
       } else if (index == 3) {
-        _displayPolylines = [_allPolylines[2]]; // ICT
+        _displayPolylines = [_allPolylines[2]];
       }
     });
   }
