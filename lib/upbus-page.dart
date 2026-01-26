@@ -32,6 +32,7 @@ class _UpBusHomePageState extends State<UpBusHomePage> {
 
   List<Polyline> _allPolylines = []; // เก็บเส้นทางทั้งหมด 3 สาย
   List<Polyline> _displayPolylines = []; // เก็บเส้นทางที่จะแสดงผลปัจจุบัน
+  Polyline? _routeNamorPKY;
 
   // --- Multi-Bus Tracking Variables ---
   StreamSubscription? _busSubscription;
@@ -65,6 +66,11 @@ class _UpBusHomePageState extends State<UpBusHomePage> {
       // 0=หน้ามอ(เขียว), 1=หอใน(แดง), 2=ICT(น้ำเงิน)
       Polyline routeNamor = await _parseGeoJson(
         'assets/data/bus_route1.geojson',
+        const Color.fromRGBO(68, 182, 120, 1),
+      );
+      //เส้นทางก่อนบ่ายสอง
+      _routeNamorPKY = await _parseGeoJson(
+        'assets/data/bus_route1เส้นทางก่อนบ่าย2.geojson',
         const Color.fromRGBO(68, 182, 120, 1),
       );
       Polyline routeHornai = await _parseGeoJson(
@@ -107,14 +113,27 @@ class _UpBusHomePageState extends State<UpBusHomePage> {
 
   // --- ส่วนที่ต้องเพิ่ม: ฟังก์ชันกรองเส้นทางตามปุ่ม ---
   void _filterRoutes(int index) {
+    if (_allPolylines.isEmpty) return;
+
     setState(() {
+      //เช็คเวลา
+      final now = DateTime.now();
+      // เช็คว่าเวลาตอนนี้ >= 14:00
+      bool isAfter2PM = now.hour >= 14;
+
+      // เลือกเส้นทางหน้ามอตามเวลา
+      Polyline currentNamor = (isAfter2PM && _routeNamorPKY != null)
+          ? _routeNamorPKY!
+          : _allPolylines[0];
+
       if (index == 0) {
-        _displayPolylines = _allPolylines; // ภาพรวม
-      } else if (index == 1 && _allPolylines.isNotEmpty) {
-        _displayPolylines = [_allPolylines[0]]; // หน้ามอ
-      } else if (index == 2 && _allPolylines.length > 1) {
+        _displayPolylines = [currentNamor, _allPolylines[1], _allPolylines[2]];
+      } else if (index == 1) {
+        //แสดงเฉพาะเส้นทางหน้ามอที่เลือกตามเวลาแล้ว
+        _displayPolylines = [currentNamor];
+      } else if (index == 2) {
         _displayPolylines = [_allPolylines[1]]; // หอใน
-      } else if (index == 3 && _allPolylines.length > 2) {
+      } else if (index == 3) {
         _displayPolylines = [_allPolylines[2]]; // ICT
       }
     });
